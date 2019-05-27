@@ -1,0 +1,15 @@
+Package: ezXg
+Type: Package
+Title: Easy xbgoost wrapper
+Version: 0.1.0
+Author: Arnaud Buzzi
+Maintainer: Arnaud Buzzi <no@mail.com>
+Description: This package is a simple wrapper on the R "xgboost" package (https://xgboost.readthedocs.io) using the powerful capacity of the "data.table" package for data manipulation
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 2.2),
+    data.table,
+    xgboost
+RoxygenNote: 6.1.1
