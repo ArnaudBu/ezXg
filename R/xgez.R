@@ -74,7 +74,7 @@
 #' @examples
 #' temp.file <- tempfile()
 #' data(iris)
-#' fwrite(iris, temp.file, row.names = F)
+#' fwrite(iris, temp.file, row.names = FALSE)
 #' d <- load_data(temp.file, output = "Species")
 #'
 #' @export
@@ -284,7 +284,7 @@ load_data <- function(file,
 #' @examples
 #' temp.file <- tempfile()
 #' data(iris)
-#' fwrite(iris, temp.file, row.names = F)
+#' fwrite(iris, temp.file, row.names = FALSE)
 #' d <- load_data(temp.file, output = "Species", train.size = 0.8)
 #' md <- xg_train(d)
 #'
@@ -440,7 +440,7 @@ xg_train <- function(data,
 #' Grid search
 #'
 #' \code{xg_gs} use coordinate descent
-#'  (\link{https://en.wikipedia.org/wiki/Coordinate_descent}) in order
+#'  (\url{https://en.wikipedia.org/wiki/Coordinate_descent}) in order
 #'  to select the best set of parameters for an xgboost model. At the end
 #'  of the coordinate descent algorithm, a full search on each of the
 #'  individual parameter vectors is made in order to potentially improve
@@ -483,11 +483,12 @@ xg_train <- function(data,
 #'
 #' @import data.table
 #' @import xgboost
+#' @importFrom stats as.formula median model.matrix na.omit predict quantile
 #'
 #' @examples
 #' temp.file <- tempfile()
 #' data(iris)
-#' fwrite(iris, temp.file, row.names = F)
+#' fwrite(iris, temp.file, row.names = FALSE)
 #' d <- load_data(temp.file, output = "Species", train.size = 0.8)
 #' t <- xg_gs(d)
 #'
@@ -510,18 +511,18 @@ xg_gs <- function(data,
 
   # Optimization function
   fn <- function(x){
-    md <- XGTrain(data,
-                 cv = 5,
-                 verbose = 0,
-                 eta = x[1],
-                 gamma = x[2],
-                 max_depth = x[3],
-                 colsample_bytree = x[4],
-                 min_child_weight = x[5],
-                 nthread = nthread,
-                 nrounds = nrounds,
-                 seed = seed,
-                 objective = objective
+    md <- xg_train(data,
+                   cv = 5,
+                   verbose = 0,
+                   eta = x[1],
+                   gamma = x[2],
+                   max_depth = x[3],
+                   colsample_bytree = x[4],
+                   min_child_weight = x[5],
+                   nthread = nthread,
+                   nrounds = nrounds,
+                   seed = seed,
+                   objective = objective
     )
     return(mean(md$test))
   }
@@ -665,7 +666,7 @@ xg_gs <- function(data,
 #' @return The prediction with the following fields:
 #' \itemize{
 #'  \item{\strong{pred}}: the prediction for the model.
-#'  \link[xgboost]{proba}: (optionnal) the associated probabilities for the
+#'  \item[\strong{proba}}: (optionnal) the associated probabilities for the
 #'  prediction in case of a classification
 #' }
 #'
@@ -675,7 +676,7 @@ xg_gs <- function(data,
 #' @examples
 #' temp.file <- tempfile()
 #' data(iris)
-#' fwrite(iris, temp.file, row.names = F)
+#' fwrite(iris, temp.file, row.names = FALSE)
 #' d <- load_data(temp.file, output = "Species", train.size = 0.8)
 #' md <- xg_train(d)
 #' p <- xg_predict(md, iris)

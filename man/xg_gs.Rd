@@ -60,7 +60,7 @@ The optimization results with the following fields:
 }
 \description{
 \code{xg_gs} use coordinate descent
- (\link{https://en.wikipedia.org/wiki/Coordinate_descent}) in order
+ (\url{https://en.wikipedia.org/wiki/Coordinate_descent}) in order
  to select the best set of parameters for an xgboost model. At the end
  of the coordinate descent algorithm, a full search on each of the
  individual parameter vectors is made in order to potentially improve
@@ -69,7 +69,7 @@ The optimization results with the following fields:
 \examples{
 temp.file <- tempfile()
 data(iris)
-fwrite(iris, temp.file, row.names = F)
+fwrite(iris, temp.file, row.names = FALSE)
 d <- load_data(temp.file, output = "Species", train.size = 0.8)
 t <- xg_gs(d)
 

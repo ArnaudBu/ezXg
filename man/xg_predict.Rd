@@ -13,14 +13,6 @@ xg_predict(model, data)
 \item{data}{\strong{data.frame}. A data.frame or data.table structure with
 column names equal to the input names.}
 }
-\value{
-The prediction with the following fields:
-\itemize{
- \item{\strong{pred}}: the prediction for the model.
- \link[xgboost]{proba}: (optionnal) the associated probabilities for the
- prediction in case of a classification
-}
-}
 \description{
 \code{xg_predict} use the previously trained xgboost model to perform
 prediction on new data.
@@ -28,7 +20,7 @@ prediction on new data.
 \examples{
 temp.file <- tempfile()
 data(iris)
-fwrite(iris, temp.file, row.names = F)
+fwrite(iris, temp.file, row.names = FALSE)
 d <- load_data(temp.file, output = "Species", train.size = 0.8)
 md <- xg_train(d)
 p <- xg_predict(md, iris)

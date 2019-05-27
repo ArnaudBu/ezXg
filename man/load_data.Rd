@@ -79,7 +79,7 @@ on two categories of input: numeric (\emph{num}) and category (\emph{cat}).
 \examples{
 temp.file <- tempfile()
 data(iris)
-fwrite(iris, temp.file, row.names = F)
+fwrite(iris, temp.file, row.names = FALSE)
 d <- load_data(temp.file, output = "Species")
 
 }
