@@ -12,7 +12,7 @@ xg_gs(data, eta = c(0.05, 0.1, 0.15, 0.2, 0.25, 0.3), gamma = c(0, 0.1,
 }
 \arguments{
 \item{data}{\strong{Object}. A data structure created by the call of the
-\link[ezXg]{load_data} function.}
+\link[ezXg]{xg_load_data} function.}
 
 \item{eta}{\strong{Numeric Vectors}. Eta parameter list for grid search.
 See \link[xgboost]{xgb.train} for more details.}
@@ -67,10 +67,11 @@ The optimization results with the following fields:
  the selection.
 }
 \examples{
-temp.file <- tempfile()
-data(iris)
-fwrite(iris, temp.file, row.names = FALSE)
-d <- load_data(temp.file, output = "Species", train.size = 0.8)
+d <- xg_load_data(system.file("extdata", "titanic.csv", package = "ezXg"),
+               inputs = c("Pclass", "Sex", "Age", "SibSp",
+                          "Parch", "Fare", "Embarked"),
+               output = "Survived",
+               train.size = 0.8)
 t <- xg_gs(d)
 
 }

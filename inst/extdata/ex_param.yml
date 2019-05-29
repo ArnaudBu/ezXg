@@ -1,0 +1,62 @@
+global:
+  seed: 1 # Seed for the model
+  train.size: 0.8 # Training size for validation
+  max.levels: 50 # maximum number of levels for factors
+  nthread: 2 # Number of thread for the training
+  verbose: true # Should information be printed ?
+  retrain.full: true # If set to true, the model is trained with full dataset at the end
+model:
+  inputs: # Input columns (either list or set to "auto")
+    - "Pclass"
+    - "Sex"
+    - "Age"
+    - "SibSp"
+    - "Parch"
+    - "Fare"
+    - "Embarked"
+  output: "Survived" # Output column
+  inputs.class: "auto" # Input class (either list or set to "auto")
+  output.class: "auto" # Output class (either "cat", "num" or "auto")
+  na.handle: "mean" # Way to handle NA for numeric values
+param:
+  eta: # Eta parameter, either one value or list if cv > 1
+    - 0.05
+    - 0.1
+    - 0.15
+    - 0.2
+    - 0.25
+    - 0.3
+  gamma: # Gamma parameter, either one value or list if cv > 1
+    - 0.0
+    - 0.1
+    - 0.2
+    - 0.3
+    - 0.4
+    - 0.5
+  max_depth: # Max_depth parameter, either one value or list if cv > 1
+    - 1
+    - 3
+    - 4
+    - 5
+    - 6
+    - 8
+    - 10
+    - 12
+    - 15
+  colsample_bytree: # Colsample_bytree parameter, either one value or list if cv > 1
+    - 0.3
+    - 0.4
+    - 0.5
+    - 0.7
+    - 0.8
+    - 0.9
+    - 1.0
+  min_child_weight: # Min_child_weight parameter, either one value or list if cv > 1
+    - 1
+    - 3
+    - 5
+    - 7
+  nrounds: 100 # Number of rounds for the training
+  objective: "auto" # Objective function
+  cv: 5 # Number of folds for cross validation. If set to 1, there will not be any.
+

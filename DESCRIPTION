@@ -11,5 +11,6 @@ LazyData: true
 Depends:
     R (>= 2.2),
     data.table,
-    xgboost
+    xgboost,
+    yaml
 RoxygenNote: 6.1.1
