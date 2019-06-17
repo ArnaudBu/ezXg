@@ -519,7 +519,7 @@ xg_gs <- function(data,
   # Optimization function
   fn <- function(x){
     md <- xg_train(data,
-                   cv = 5,
+                   cv = cv,
                    verbose = 0,
                    eta = x[1],
                    gamma = x[2],
@@ -955,4 +955,124 @@ xg_auto_ml <- function(data,
                    objective = p$param$objective
     )
   }
+}
+
+# Bayesian Optimization -----
+
+#' Bayesian Optimization
+#'
+#' \code{xg_bo} use the bayesian optimization algorithm implemented in
+#'  the \code{rBayesianOptimization} package in order
+#'  to select the best set of parameters for an xgboost model.
+#'
+#' @param data \strong{Object}. A data structure created by the call of the
+#' \link[ezXg]{xg_load_data} function.
+#' @param eta \strong{Numeric Vectors}. Eta parameter min and max bounds.
+#' @param gamma \strong{Numeric Vector}. Gamma parameter min and max bounds.
+#' @param max_depth \strong{Numeric Vector}. Max_depth parameter min and max bounds.
+#' Use "L" suffix to indicate integer hyperparameter.
+#' @param colsample_bytree \strong{Numeric Vector}. Colsample_bytree parameter
+#' min and max bounds.
+#' @param min_child_weight \strong{Numeric Vector}. Min_child_weight parameter
+#' min and max bounds. Use "L" suffix to indicate integer hyperparameter.
+#' @param nrounds \strong{Numeric}. Nrounds parameter for xgboost calibration.
+#' See \link[xgboost]{xgb.train} for more details.
+#' @param nthread \strong{Numeric}. Nthread parameter for xgboost calibration.
+#' See \link[xgboost]{xgb.train} for more details.
+#' @param verbose \strong{Logical}. Verbose parameter for grid search.
+#' @param cv \strong{Numeric}. Number of folds in cross validation. Needs
+#' to be more than 2.
+#' @param seed \strong{Numeric}. Seed for computation reproducability.
+#' @param objective \strong{Character}. Objective function for the
+#' optimization. . Eta parameter for xgboost calibration. See
+#'  \link[xgboost]{xgb.train} for more details. Can be set to \emph{auto}
+#'  in order to let the function choose the better model regarding the
+#'  output variable.
+#' @param ... Other parameters from \link[rBayesianOptimization]{BayesianOptimization}.
+#'
+#' @return The optimization results with the following fields:
+#' \itemize{
+#'  \item{\strong{param}}: the optimal set of parameters.
+#'  \item{\strong{err}}: the error associated to the optimal parameter
+#'  set.
+#'  \item{\strong{results}}: the history of the results for the
+#'  cross-validation with all the tested sets of parameters.
+#' }
+#'
+#' @import data.table
+#' @import xgboost
+#' @import rBayesianOptimization
+#' @importFrom stats as.formula median model.matrix na.omit predict quantile
+#'
+#' @examples
+#' d <- xg_load_data(system.file("extdata", "titanic.csv", package = "ezXg"),
+#'                inputs = c("Pclass", "Sex", "Age", "SibSp",
+#'                           "Parch", "Fare", "Embarked"),
+#'                output = "Survived",
+#'                train.size = 0.8)
+#' t <- xg_bo(d)
+#'
+#' @export
+xg_bo <- function(data,
+                  eta = c(0.05, 0.3),
+                  gamma = c(0, 0.5),
+                  max_depth = c(1L,15L),
+                  colsample_bytree = c(0.5,1),
+                  min_child_weight = c(1L, 7L),
+                  nrounds = 100,
+                  nthread = 2,
+                  cv = 5,
+                  seed = 1,
+                  objective = "auto",
+                  init_grid_dt = NULL,
+                  kernel = list(type =
+                                  "exponential", power = 2),
+                  init_points = 10,
+                  n_iter = 50,
+                  acq = "ucb",
+                  kappa = 2.576,
+                  eps = 0.0,
+                  verbose = TRUE){
+
+  # Check the parameters
+  if (cv < 2) stop("Invalid number of cross validation")
+
+  # Optimization function
+  fn <- function(eta, gamma, max_depth, colsample_bytree, min_child_weight){
+    md <- xg_train(data,
+                   cv = cv,
+                   verbose = 0,
+                   eta = eta,
+                   gamma = gamma,
+                   max_depth = max_depth,
+                   colsample_bytree = colsample_bytree,
+                   min_child_weight = min_child_weight,
+                   nthread = nthread,
+                   nrounds = nrounds,
+                   seed = seed,
+                   objective = objective
+    )
+    return(list(Score = - mean(md$test), Pred = 1))
+  }
+
+  # Optimization process
+  opt <- BayesianOptimization(fn,
+                              bounds = list(eta = eta,
+                                            gamma = gamma,
+                                            max_depth = max_depth,
+                                            colsample_bytree = colsample_bytree,
+                                            min_child_weight = min_child_weight),
+                              init_grid_dt = init_grid_dt,
+                              init_points = init_points,
+                              n_iter = n_iter,
+                              acq = acq,
+                              kernel = kernel,
+                              kappa = kappa,
+                              eps = eps,
+                              verbose = verbose)
+
+  # Return the results
+  return(list(param = opt$Best_Par,
+              err = abs(opt$Best_Value),
+              results = opt$History))
 }
