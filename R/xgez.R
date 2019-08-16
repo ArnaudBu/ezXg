@@ -959,7 +959,8 @@ xg_auto_ml <- function(data,
   # Return
   return(list(
     data = d,
-    res = md
+    res = md,
+    prm = prm
   ))
 }
 
