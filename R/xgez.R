@@ -955,6 +955,12 @@ xg_auto_ml <- function(data,
                    objective = p$param$objective
     )
   }
+
+  # Return
+  return(list(
+    data = d,
+    res = md
+  ))
 }
 
 # Bayesian Optimization -----
